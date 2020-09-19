@@ -5,7 +5,7 @@ public class Person {
     private String username;
 
     private Integer age;
-
+    private String password;
     public Person(String username, Integer age) {
         this.username = username;
         this.age = age;
