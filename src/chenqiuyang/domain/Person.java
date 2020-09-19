@@ -6,6 +6,7 @@ public class Person {
 
     private Integer age;
     private String password;
+    private String phone;
     public Person(String username, Integer age) {
         this.username = username;
         this.age = age;
