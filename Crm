@@ -1,0 +1,122 @@
+创建数据库表
+
+CREATE DATABASE db_crm DEFAULT CHARACTER SET UTF8;
+
+
+-- 创建客户表 --
+CREATE TABLE customer(
+	customer_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "客户ID主键",
+	customer_name VARCHAR(50) NOT NULL COMMENT "客户名称",
+	phone VARCHAR(30) NOT NULL COMMENT "手机号",
+	status INT DEFAULT 0 COMMENT "客户状态",
+	person_liable_id INT NOT NULL COMMENT "客户负责人关联员工表主键",
+	founder_id INT NOT NULL COMMENT "客户创建人,关联员工表主键",
+	source_id INT NOT NULL COMMENT "客户来源,关联客户来源表主键",
+	industry_id INT NOT NULL COMMENT "客户行业,关联行业表主键",
+	level_id INT NOT NULL COMMENT "客户级别,关联级别表主键",
+	create_time DATETIME COMMENT "创建时间",
+	update_time DATETIME COMMENT "更新时间",
+	next_contact_time DATETIME COMMENT "下次联系时间",
+	flag INT DEFAULT 0 COMMENT "客户线索标志位,0:表示线索 1:表示客户"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="客户表";
+
+-- 员工表
+CREATE TABLE employee(
+	employee_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "员工ID主键",
+	employee_name VARCHAR(50) NOT NULL COMMENT "员工名称"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="员工表";
+
+-- 来源表
+CREATE TABLE sources(
+	source_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "来源ID主键",
+	source_name VARCHAR(50) NOT NULL COMMENT "来源名称"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="来源表";
+
+
+
+-- 行业表
+CREATE TABLE industry(
+	industry_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "行业ID主键",
+	industry_name VARCHAR(50) NOT NULL COMMENT "行业名称"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="行业表";
+
+
+
+-- 客户级别表
+CREATE TABLE levels(
+	level_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "级别ID主键",
+	level_name VARCHAR(50) NOT NULL COMMENT "级别名称"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="级别表";
+
+
+
+-- 添加外键
+ALTER TABLE customer ADD FOREIGN KEY(person_liable_id) REFERENCES employee(employee_id);
+ALTER TABLE customer ADD FOREIGN KEY(founder_id) REFERENCES employee(employee_id);
+ALTER TABLE customer ADD FOREIGN KEY(source_id) REFERENCES sources(source_id);
+ALTER TABLE customer ADD FOREIGN KEY(industry_id) REFERENCES industry(industry_id);
+ALTER TABLE customer ADD FOREIGN KEY(level_id) REFERENCES levels(level_id);
+
+-- 创建产品表
+CREATE TABLE product(
+	product_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "产品ID主键",
+	product_name VARCHAR(50) NOT NULL COMMENT "产品名称",
+	product_code VARCHAR(255) COMMENT "产品编号",
+	product_category_id INT NOT NULL COMMENT "商品分类,关联分类表主键",
+	price double(10,2) DEFAULT '0.0' COMMENT "商品价格",
+	founder_id INT NOT NULL COMMENT "产品创建人,关联用户表主键",
+	create_time DATETIME COMMENT "创建时间",
+	update_time DATETIME COMMENT "更新时间",
+	flag INT DEFAULT 0 COMMENT "是否上/下架 0:下架 1:上架"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="产品表";
+
+
+-- 产品分类表
+CREATE TABLE category(
+	category_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "分类ID主键",
+	category_name VARCHAR(50) NOT NULL COMMENT "分类名称"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="产品分类表";
+
+-- 关联
+ALTER TABLE product ADD FOREIGN KEY(product_category_id) REFERENCES category(category_id);
+ALTER TABLE product ADD FOREIGN KEY(founder_id) REFERENCES employee(employee_id);
+
+-- 合同表
+CREATE TABLE contract(
+	contract_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "合同编号主键",
+	contract_name VARCHAR(50) NOT NULL COMMENT "合同名称",
+	customer_id INT NOT NULL COMMENT "客户ID，关联客户表主键",
+	contract_money double(10,2) DEFAULT 0.0 COMMENT "合同金额",
+	customer_signer VARCHAR(20) COMMENT "客户签约人",
+	employee_signer_id INT NOT NULL COMMENT "公司签约人ID,关联员工表主键",
+	employee_responsible_id INT NOT NULL COMMENT "负责人ID，关联员工表主键",
+	employee01_id INT NOT NULL COMMENT "审批人1,关联员工表主键",
+	employee02_id INT NOT NULL COMMENT "审批人2,关联员工表主键",
+	flag INT DEFAULT 0 COMMENT "合同状态, 1: 审批人1通过 2:审批人1不通过 3:审批人2通过 4:审批人2不通过",
+	start_time DATETIME COMMENT "生效时间",
+    end_time DATETIME COMMENT "结束时间"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="合同表";
+
+-- 外键
+ALTER TABLE contract ADD FOREIGN KEY(customer_id) REFERENCES customer(customer_id);
+ALTER TABLE contract ADD FOREIGN KEY(employee_signer_id) REFERENCES employee(employee_id);
+ALTER TABLE contract ADD FOREIGN KEY(employee_responsible_id) REFERENCES employee(employee_id);
+ALTER TABLE contract ADD FOREIGN KEY(employee01_id) REFERENCES employee(employee_id);
+ALTER TABLE contract ADD FOREIGN KEY(employee02_id) REFERENCES employee(employee_id);
+
+-- 合同产品关联表
+CREATE TABLE contract_product(
+	contract_product_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "合同产品ID主键",
+	contract_id INT NOT NULL COMMENT "合同ID,关联合同表主键",
+	product_id INT NOT NULL COMMENT "关联产品表主键"
+)AUTO_INCREMENT=10000 DEFAULT CHARSET=UTF8 COMMENT="合同产品关联表";
+
+
+-- 外键关联
+ALTER TABLE contract_product ADD FOREIGN KEY(contract_id) REFERENCES contract(contract_id);
+ALTER TABLE contract_product ADD FOREIGN KEY(product_id) REFERENCES product(product_id);
+
+
+
+
+
